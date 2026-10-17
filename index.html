@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My route from operations to data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F7F9; --paper:#FFFFFF; --ink:#14213D; --muted:#5B6B7F; --rule:#D6DEE6;
+  --line:#0E7C7B; --line-soft:#CFE7E6; --signal:#F2A900; --signal-ink:#5A3E00;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1726; --paper:#17223A; --ink:#E6EDF5; --muted:#9AAABD; --rule:#2A3955;
+    --line:#3FB8AF; --line-soft:#1D3D45; --signal:#F5B82E; --signal-ink:#2B1E00;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1726; --paper:#17223A; --ink:#E6EDF5; --muted:#9AAABD; --rule:#2A3955;
+  --line:#3FB8AF; --line-soft:#1D3D45; --signal:#F5B82E; --signal-ink:#2B1E00;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1.0625rem;line-height:1.55}
+.wrap{max-width:960px;margin:0 auto;padding:0 1.25rem}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0}
+a{color:var(--line)}
+:focus-visible{outline:3px solid var(--signal);outline-offset:2px;border-radius:4px}
+
+/* Hero */
+header{padding:3.5rem 0 2.5rem}
+h1{font-size:clamp(2.2rem,6vw,3.9rem);font-weight:800;letter-spacing:-.02em;max-width:14ch}
+.lede{color:var(--muted);max-width:56ch;margin:1rem 0 0;font-size:1.125rem}
+.facts{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;margin:1.25rem 0 0;padding:0;list-style:none;font-weight:700}
+.facts li span{color:var(--muted);font-weight:400}
+
+.route{margin:2.5rem 0 0;overflow-x:auto;padding-bottom:.5rem}
+.route-inner{min-width:640px;position:relative}
+.track{position:absolute;left:calc(100%/24);right:calc(100%/24);top:13px;height:6px;border-radius:3px;background:var(--line-soft)}
+.track-fill{height:100%;border-radius:3px;background:var(--line);width:0;transition:width .6s ease}
+.stations{display:grid;grid-template-columns:repeat(12,1fr);position:relative}
+.station{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:var(--muted);font-size:.8rem;gap:.4rem}
+.dot{width:32px;height:32px;border-radius:50%;background:var(--paper);border:4px solid var(--line-soft);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:.8rem;color:var(--muted)}
+.station.done .dot{background:var(--line);border-color:var(--line);color:#fff}
+.station.now .dot{background:var(--signal);border-color:var(--signal);color:var(--signal-ink)}
+.station.now{color:var(--ink);font-weight:700}
+.halfmark{display:grid;grid-template-columns:4fr 5fr 3fr;margin-top:.75rem;font-size:.85rem;color:var(--muted)}
+.halfmark div{border-top:2px solid var(--rule);padding-top:.35rem;margin:0 6px}
+.progress-note{margin-top:1.25rem;font-weight:700}
+.progress-note span{color:var(--muted);font-weight:400}
+
+/* Plan */
+.half{padding:2.5rem 0 0}
+.half > h2{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:700}
+.half > p{color:var(--muted);max-width:60ch;margin:.5rem 0 0}
+.phase{margin-top:2rem}
+.phase h3{font-size:1.25rem;font-weight:700;margin-bottom:.25rem}
+.phase > p{color:var(--muted);margin:0 0 1rem;max-width:60ch}
+.months{position:relative;padding-left:2.75rem}
+.months::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:6px;border-radius:3px;background:var(--line-soft)}
+.month{position:relative;background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:1.25rem 1.25rem 1rem;margin-bottom:1rem}
+.month .mdot{position:absolute;left:-2.75rem;top:1.1rem;width:36px;height:36px;border-radius:50%;background:var(--paper);border:4px solid var(--line-soft);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:.85rem;color:var(--muted)}
+.month.done .mdot{background:var(--line);border-color:var(--line);color:#fff}
+.month.now{border-color:var(--signal);box-shadow:0 0 0 1px var(--signal)}
+.month.now .mdot{background:var(--signal);border-color:var(--signal);color:var(--signal-ink)}
+.mhead{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap}
+.mhead h4{font-family:var(--display);font-size:1.15rem;margin:0;font-weight:700}
+.mcount{font-size:.85rem;color:var(--muted)}
+.goal{margin:.3rem 0 .75rem;color:var(--muted)}
+.tasks{list-style:none;margin:0;padding:0}
+.tasks li{border-top:1px solid var(--rule)}
+.tasks label{display:flex;gap:.75rem;align-items:flex-start;padding:.6rem 0;cursor:pointer}
+.tasks input{appearance:none;flex:none;width:22px;height:22px;margin:.12rem 0 0;border:2px solid var(--muted);border-radius:6px;display:grid;place-items:center;cursor:pointer;background:var(--paper)}
+.tasks input:checked{background:var(--line);border-color:var(--line)}
+.tasks input:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.tasks input:checked + span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.milestone{margin:.75rem 0 0;padding:.6rem .8rem;border-radius:10px;background:var(--line-soft);font-size:.95rem}
+.milestone b{font-family:var(--display)}
+.res{margin:.6rem 0 0;font-size:.9rem;color:var(--muted)}
+
+/* Budget */
+section.block{padding:3rem 0 0}
+section.block > h2{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:700}
+section.block > p{color:var(--muted);max-width:60ch;margin:.5rem 0 1.25rem}
+.panel{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:1.25rem}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:520px}
+th,td{text-align:left;padding:.65rem .5rem;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:.85rem;color:var(--muted);font-weight:700}
+td.num,th.num{text-align:right;white-space:nowrap}
+td small{display:block;color:var(--muted);font-size:.85rem}
+.spend{width:6.5rem;font:inherit;padding:.35rem .5rem;border:1px solid var(--rule);border-radius:8px;background:var(--bg);color:var(--ink);text-align:right}
+.meter{height:12px;border-radius:6px;background:var(--line-soft);margin:1rem 0 .5rem;overflow:hidden}
+.meter div{height:100%;background:var(--line);width:0;transition:width .4s}
+.meter.over div{background:var(--signal)}
+.totals{display:flex;flex-wrap:wrap;gap:.5rem 2rem;font-weight:700}
+.totals span{color:var(--muted);font-weight:400}
+
+.reset{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;margin-top:1rem}
+.reset label{font-weight:700}
+.reset-note{flex-basis:100%;margin:0;color:var(--muted);font-size:.95rem}
+.reset-note.soon{color:var(--ink);background:var(--signal);background:color-mix(in srgb,var(--signal) 25%,transparent);padding:.5rem .75rem;border-radius:10px}
+/* Year 2 */
+.y2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
+.y2 .panel h3{font-size:1.1rem;margin-bottom:.35rem}
+.y2 .panel p{margin:0 0 .5rem;color:var(--muted);font-size:.95rem}
+.y2 .panel ul{margin:0;padding-left:1.1rem;font-size:.95rem}
+/* Wins */
+.winform{display:flex;flex-direction:column;gap:.6rem}
+.winform textarea{font:inherit;min-height:4.5rem;padding:.6rem .75rem;border:1px solid var(--rule);border-radius:10px;background:var(--bg);color:var(--ink);resize:vertical}
+.btn{align-self:flex-start;font:inherit;font-weight:700;padding:.55rem 1.1rem;border-radius:999px;border:0;background:var(--ink);color:var(--bg);cursor:pointer}
+.winlist{list-style:none;margin:1rem 0 0;padding:0}
+.winlist li{display:flex;gap:1rem;justify-content:space-between;align-items:flex-start;border-top:1px solid var(--rule);padding:.7rem 0}
+.winlist time{display:block;font-size:.85rem;color:var(--muted)}
+.del{font:inherit;font-size:.85rem;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;flex:none}
+.empty{color:var(--muted);margin:1rem 0 0}
+
+.habits{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+.habits .panel h3{font-size:1.05rem;margin-bottom:.35rem}
+.habits .panel p{margin:0;color:var(--muted);font-size:.95rem}
+
+footer{padding:3rem 0 3rem;color:var(--muted);font-size:.9rem}
+.sync{font-size:.85rem;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:560px){.months{padding-left:2.25rem}.month .mdot{left:-2.35rem;width:30px;height:30px;font-size:.75rem}.months::before{left:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>My route from operations to data</h1>
+    <p class="lede">A year-long plan to go from operations coordinator to analyst-ready in four months, then build the Python, machine learning and portfolio you need for data science. Tick things off as you go and the route fills in.</p>
+    <ul class="facts">
+      <li>12 months <span>at 1.5–2 hours a day</span></li>
+      <li>£1,000 <span>learning budget</span></li>
+      <li>Metabase <span>as your practice ground</span></li>
+    </ul>
+    <div class="route" aria-label="Progress by month">
+      <div class="route-inner">
+        <div class="track"><div class="track-fill" id="trackFill"></div></div>
+        <nav class="stations" id="stations"></nav>
+        <div class="halfmark"><div>Analyst-ready</div><div>Python and machine learning</div><div>Going deeper</div></div>
+      </div>
+    </div>
+    <p class="progress-note" id="progressNote"></p>
+    <p class="sync" id="syncNote"></p>
+  </header>
+
+  <div id="plan"></div>
+
+  <section class="block" id="budget">
+    <h2>Budget</h2>
+    <p>Planned amounts are estimates, so check current prices before buying. Enter what you actually spend to keep track of what's left.</p>
+    <div class="panel">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Item</th><th class="num">Planned</th><th class="num">Spent</th></tr></thead>
+          <tbody id="budgetRows"></tbody>
+        </table>
+      </div>
+      <div class="reset">
+        <label for="resetDate">Budget resets on</label>
+        <input type="date" id="resetDate" class="spend" style="width:auto;text-align:left">
+        <p id="resetNote" class="reset-note"></p>
+      </div>
+      <div class="meter" id="meter"><div></div></div>
+      <div class="totals" id="totals"></div>
+    </div>
+  </section>
+
+  <section class="block" id="wins">
+    <h2>Wins log</h2>
+    <p>Write down every analysis that saved time or helped someone make a decision. This is your evidence when you ask for an analyst role.</p>
+    <div class="panel">
+      <div class="winform">
+        <label for="winText" class="sync">What did you do, and what changed because of it?</label>
+        <textarea id="winText" placeholder="Built a Metabase dashboard for weekly order delays. The team stopped compiling it by hand, saving about 2 hours a week."></textarea>
+        <button class="btn" id="addWin" type="button">Add win</button>
+      </div>
+      <ul class="winlist" id="winList"></ul>
+    </div>
+  </section>
+
+  <section class="block" id="year2">
+    <h2>Year 2: from analyst to data scientist</h2>
+    <p>Your next £1,000 builds on this year. Choose the track that fits what you enjoyed most, ideally from inside an analyst role.</p>
+    <div class="y2">
+      <div class="panel"><h3>Deeper machine learning</h3><p>For building and evaluating models properly.</p>
+        <ul><li>Hands-On Machine Learning (Géron)</li><li>fast.ai's free Practical Deep Learning course</li><li>A Kaggle competition, start to finish</li></ul></div>
+      <div class="panel"><h3>Experimentation and causal inference</h3><p>For product and business data science, the most common kind of data science role.</p>
+        <ul><li>A course on experimentation or causal inference</li><li>Trustworthy Online Controlled Experiments (Kohavi et al.)</li><li>Design and analyse a real test at work</li></ul></div>
+      <div class="panel"><h3>Forecasting</h3><p>A natural fit with your operations background.</p>
+        <ul><li>Forecasting: Principles and Practice (free online)</li><li>Build a demand or volume forecast your ops team uses</li></ul></div>
+    </div>
+    <div class="panel" style="margin-top:1rem">
+      <div class="table-scroll"><table>
+        <thead><tr><th>Suggested year 2 budget</th><th class="num">Approx.</th></tr></thead>
+        <tbody>
+          <tr><td>Main course or specialisation for your chosen track</td><td class="num">£350–£450</td></tr>
+          <tr><td>Books</td><td class="num">£100</td></tr>
+          <tr><td>Conference, ideally one focused on data science</td><td class="num">£250</td></tr>
+          <tr><td>Cloud or tooling basics (for example a cloud data certification)</td><td class="num">£100–£200</td></tr>
+          <tr><td>Flexible buffer</td><td class="num">£100</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Habits that make it stick</h2>
+    <p>These cost nothing and matter as much as any course.</p>
+    <div class="habits">
+      <div class="panel"><h3>Use AI as a study partner</h3><p>Ask it to explain a query, find a bug or check your reasoning. Always make sure you understand the answer before you use it.</p></div>
+      <div class="panel"><h3>Check your data access</h3><p>Ask your manager or the data team what you can query, especially anything with customer or health information, and whether there's a sandbox for practice.</p></div>
+      <div class="panel"><h3>Make it visible</h3><p>Share what you build, ask the data team for feedback and tell your manager what you're working toward.</p></div>
+      <div class="panel"><h3>Keep a steady rhythm</h3><p>Study six days a week and rest on the seventh. Spend most sessions on the course and a couple each week applying it at work or on a project. If you miss a day, pick up the next day rather than doubling up.</p></div>
+    </div>
+  </section>
+
+  <footer>Course names and prices were accurate as of mid-2026 and may have changed. Adjust the plan to match the skills listed in job postings you're interested in.</footer>
+</div>
+
+<script>
+const PLAN = [
+  { half:"Months 1–4: analyst-ready", intro:"By month 4 you can query data, build dashboards people rely on and reason about the numbers.",
+    phases:[
+    { title:"Data foundations", intro:"SQL and data basics, the core of every analyst job.",
+      months:[
+      { m:1, title:"Get set up and learn the basics", goal:"Start the course and get to know your company's data.",
+        tasks:["Buy Coursera Plus (annual) and start the Google Data Analytics Certificate","Finish courses 1–3 of the certificate, skimming anything you already know","Ask the data team what you can access in Metabase and whether there's a sandbox","Open three existing ops dashboards and note what each one answers","Do the introductory Metabase Learn tutorials"],
+        res:"Coursera, metabase.com/learn" },
+      { m:2, title:"SQL, then SQL at work", goal:"Write queries with confidence and answer a real ops question.",
+        tasks:["Work through all SQLBolt lessons","Build ten questions in Metabase's query builder, convert each to SQL and read the result","Solve 15 LeetCode easy database problems, focusing on joins and GROUP BY","Pick one ops question you get asked often and answer it in Metabase with SQL","Finish courses 4–6 of the certificate, which cover SQL and data cleaning","Add your first entry to the wins log"],
+        res:"SQLBolt, Mode SQL tutorial, LeetCode",
+        milestone:"You can take a business question, query the data and explain the answer." }
+      ]},
+    { title:"Visualisation and statistics", intro:"Turn numbers into something people use, and learn to trust or question them.",
+      months:[
+      { m:3, title:"Dashboards and statistics basics", goal:"Build your first team dashboard and learn how data varies.",
+        tasks:["Buy and read Storytelling with Data","Agree with your manager on one recurring report to replace","Build it as a Metabase dashboard and get feedback from two teammates","Complete Khan Academy's statistics units on distributions and variability","Watch StatQuest videos on the normal distribution, variance and correlation","Finish courses 7–9 of the Google certificate, skimming the R course since you'll learn Python instead"],
+        res:"Storytelling with Data (Knaflic), Khan Academy, StatQuest" },
+      { m:4, title:"Testing and checking in", goal:"Learn hypothesis and A/B testing, then take stock.",
+        tasks:["Buy and complete a statistics or A/B testing course","Learn what a p-value and a confidence interval really mean","Find one misleading average in your ops data and explain why","Share your dashboard more widely and see who relies on it","Review progress with your manager and mention your interest in data work"],
+        milestone:"Analyst-ready: SQL, dashboards, statistics basics and one tool people rely on." }
+      ]}
+  ]},
+  { half:"Months 5–9: Python and machine learning", intro:"By month 9 you can automate analysis in Python, understand basic machine learning and show two projects.",
+    phases:[
+    { title:"Python for analysis", intro:"Python lets you do what dashboards can't.",
+      months:[
+      { m:5, title:"Python and pandas", goal:"Write Python comfortably and analyse data with pandas.",
+        tasks:["Complete Kaggle's free Python micro-course","Complete the Python modules of the IBM Data Science Certificate","Buy Python for Data Analysis and work through the pandas chapters","Complete Kaggle's pandas course","Write small scripts daily, using AI to explain anything you don't follow"],
+        res:"Kaggle Learn, IBM Data Science Certificate, Python for Data Analysis (McKinney)" },
+      { m:6, title:"Automate something real", goal:"Use Python on real work and save your team time.",
+        tasks:["Complete Kaggle's data cleaning and data visualisation courses","Recreate one of your Metabase analyses in pandas, using data you're allowed to export","Find a manual ops task that takes someone time every week","Automate it with Python, with approval, and log the time saved as a win","Start looking at internal analyst roles and ask the data team how people have moved across"],
+        milestone:"You can automate a manual report with Python." }
+      ]},
+    { title:"Machine learning and portfolio", intro:"Machine learning basics and proof you can do the work.",
+      months:[
+      { m:7, title:"Machine learning basics", goal:"Understand how models learn from data.",
+        tasks:["Complete course 1 of Andrew Ng's Machine Learning Specialization (regression)","Buy Practical Statistics for Data Scientists and read the first three chapters","Set up GitHub and push your Python work to it"],
+        res:"Coursera, Practical Statistics for Data Scientists (Bruce & Bruce)" },
+      { m:8, title:"First portfolio project", goal:"Show what you can do on a public dataset.",
+        tasks:["Complete course 2 of the ML Specialization (classification)","Complete Kaggle's Intro to Machine Learning course","Pick an ops-flavoured public dataset, like delivery delays or demand","Publish project 1 on GitHub with a clear write-up"],
+        res:"Kaggle datasets" },
+      { m:9, title:"Second project", goal:"Finish the ML basics and build a second project.",
+        tasks:["Complete course 3 of the ML Specialization","Publish project 2 on GitHub, such as a simple demand forecast","Ask someone on the data team to review one of your projects"],
+        milestone:"Two portfolio projects and a working grasp of machine learning basics." }
+      ]}
+  ]},
+  { half:"Months 10–12: going deeper", intro:"Build the depth that sets you apart, and make your move.",
+    phases:[
+    { title:"Depth and next steps", intro:"Advanced SQL, stronger statistics and a clear path into a data role.",
+      months:[
+      { m:10, title:"Advanced SQL and analytics engineering", goal:"Write the kind of SQL analysts use every day.",
+        tasks:["Learn window functions and CTEs with Mode's advanced SQL tutorial","Rebuild one of your Metabase questions using them","Take dbt's free Fundamentals course to see how analytics engineering works","Look at how your company's product analytics tool tracks user behaviour"],
+        res:"Mode SQL tutorial, dbt Learn (free)" },
+      { m:11, title:"Stronger statistics", goal:"Analyse the effect of real changes carefully.",
+        tasks:["Finish Practical Statistics for Data Scientists","Analyse the impact of a real change at work, being clear about what the data can and can't show","Publish project 3, based on a real work-style problem using public data","Attend a data conference or workshop"] },
+      { m:12, title:"Show it and plan year 2", goal:"Make your progress visible and decide your next step.",
+        tasks:["Update your CV and LinkedIn with your projects and wins","Practise SQL interview questions on DataLemur or StrataScratch","Talk to your manager and the data team about a move to an analyst role","Plan year 2: product analytics, analytics engineering or deeper ML"],
+        milestone:"Three projects, a wins log and a clear next step." }
+      ]}
+  ]}
+];
+const BUDGET = [
+  {id:"coursera", name:"Coursera Plus (annual)", note:"Google Data Analytics, IBM Data Science, ML Specialization", plan:330},
+  {id:"books", name:"Books", note:"Storytelling with Data, Python for Data Analysis, Practical Statistics for Data Scientists", plan:120},
+  {id:"stats", name:"Statistics or A/B testing course", note:"Month 4", plan:150},
+  {id:"conf", name:"Conference or workshop", note:"Month 11", plan:250},
+  {id:"buffer", name:"Flexible buffer", note:"For whatever interests you most by then", plan:150}
+];
+const TOTAL = 1000;
+
+// Assign stable ids
+PLAN.forEach(h=>h.phases.forEach(p=>p.months.forEach(mo=>{mo.ids=mo.tasks.map((_,i)=>`v2m${mo.m}t${i}`)})));
+const ALL_MONTHS = PLAN.flatMap(h=>h.phases.flatMap(p=>p.months));
+const ALL_TASKS = ALL_MONTHS.flatMap(m=>m.ids);
+
+let state = {done:{}, spend:{}, wins:[], reset:""};
+let store = null;          // db doc ref when available
+const LS_KEY = "ops-data-roadmap-v1";
+
+function loadLocal(){try{const s=localStorage.getItem(LS_KEY); if(s) state=Object.assign({done:{},spend:{},wins:[],reset:""},JSON.parse(s));}catch(e){}}
+function saveLocal(){try{localStorage.setItem(LS_KEY,JSON.stringify(state));}catch(e){}}
+
+let saveTimer=null, writing=false, pending=false;
+function queueSave(){
+  saveLocal();
+  if(!store) return;
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(flush,700);
+}
+async function flush(){
+  if(!store) return;
+  if(writing){pending=true;return;}
+  writing=true;
+  try{ await store.set(JSON.parse(JSON.stringify(state))); setSync("Progress saved to this page."); }
+  catch(e){ if(e && (e.code==="permission_denied"||e.code==="not_granted")){ setSync("This view is read-only, so changes won't be saved here."); store=null; } else setSync("Couldn't save just now. Your changes are kept in this browser."); }
+  writing=false;
+  if(pending){pending=false;flush();}
+}
+function setSync(t){document.getElementById("syncNote").textContent=t;}
+
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+function monthDone(mo){return mo.ids.every(id=>state.done[id]);}
+function currentMonth(){const m=ALL_MONTHS.find(mo=>!monthDone(mo)); return m?m.m:null;}
+
+function renderPlan(){
+  const el=document.getElementById("plan");
+  el.innerHTML=PLAN.map(h=>`
+    <section class="half"><h2>${esc(h.half)}</h2><p>${esc(h.intro)}</p>
+    ${h.phases.map(p=>`
+      <div class="phase"><h3>${esc(p.title)}</h3><p>${esc(p.intro)}</p>
+        <div class="months">
+        ${p.months.map(mo=>`
+          <article class="month" id="month-${mo.m}" data-m="${mo.m}">
+            <div class="mdot" aria-hidden="true">${mo.m}</div>
+            <div class="mhead"><h4>Month ${mo.m}: ${esc(mo.title)}</h4><span class="mcount" id="count-${mo.m}"></span></div>
+            <p class="goal">${esc(mo.goal)}</p>
+            <ul class="tasks">
+              ${mo.tasks.map((t,i)=>`<li><label><input type="checkbox" data-id="${mo.ids[i]}"><span>${esc(t)}</span></label></li>`).join("")}
+            </ul>
+            ${mo.res?`<p class="res">Resources: ${esc(mo.res)}</p>`:""}
+            ${mo.milestone?`<p class="milestone"><b>Milestone.</b> ${esc(mo.milestone)}</p>`:""}
+          </article>`).join("")}
+        </div>
+      </div>`).join("")}
+    </section>`).join("");
+  el.addEventListener("change",e=>{
+    const id=e.target.dataset&&e.target.dataset.id; if(!id) return;
+    if(e.target.checked) state.done[id]=true; else delete state.done[id];
+    refresh(); queueSave();
+  });
+
+  document.getElementById("stations").innerHTML=ALL_MONTHS.map(mo=>`<a class="station" href="#month-${mo.m}" id="st-${mo.m}"><span class="dot">${mo.m}</span><span>M${mo.m}</span></a>`).join("");
+
+  document.getElementById("budgetRows").innerHTML=BUDGET.map(b=>`
+    <tr><td>${esc(b.name)}<small>${esc(b.note)}</small></td><td class="num">£${b.plan}</td>
+    <td class="num"><label class="visually-hidden" for="sp-${b.id}" style="position:absolute;left:-9999px">Spent on ${esc(b.name)}</label><input class="spend" id="sp-${b.id}" data-b="${b.id}" type="number" min="0" step="1" inputmode="decimal" placeholder="0"></td></tr>`).join("")
+    + `<tr><td><b>Total</b></td><td class="num"><b>£${BUDGET.reduce((a,b)=>a+b.plan,0)}</b></td><td></td></tr>`;
+  document.getElementById("budgetRows").addEventListener("input",e=>{
+    const id=e.target.dataset&&e.target.dataset.b; if(!id) return;
+    const v=parseFloat(e.target.value);
+    if(isNaN(v)||v<=0) delete state.spend[id]; else state.spend[id]=v;
+    refreshBudget(); queueSave();
+  });
+
+  document.getElementById("resetDate").addEventListener("change",e=>{
+    state.reset=/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)?e.target.value:"";
+    refreshBudget(); queueSave();
+  });
+  document.getElementById("addWin").addEventListener("click",()=>{
+    const ta=document.getElementById("winText"); const t=ta.value.trim(); if(!t) {ta.focus();return;}
+    state.wins.unshift({t, d:new Date().toISOString().slice(0,10)}); ta.value="";
+    renderWins(); queueSave();
+  });
+  document.getElementById("winList").addEventListener("click",e=>{
+    const i=e.target.dataset&&e.target.dataset.i; if(i===undefined) return;
+    state.wins.splice(Number(i),1); renderWins(); queueSave();
+  });
+}
+
+function refresh(){
+  document.querySelectorAll(".tasks input").forEach(cb=>{cb.checked=!!state.done[cb.dataset.id]});
+  const now=currentMonth();
+  ALL_MONTHS.forEach(mo=>{
+    const n=mo.ids.filter(id=>state.done[id]).length, done=n===mo.ids.length;
+    const card=document.getElementById("month-"+mo.m), st=document.getElementById("st-"+mo.m);
+    card.classList.toggle("done",done); card.classList.toggle("now",mo.m===now);
+    st.classList.toggle("done",done); st.classList.toggle("now",mo.m===now);
+    if(mo.m===now) st.setAttribute("aria-current","step"); else st.removeAttribute("aria-current");
+    document.getElementById("count-"+mo.m).textContent=`${n} of ${mo.ids.length} done`;
+  });
+  const doneCount=ALL_TASKS.filter(id=>state.done[id]).length;
+  const monthsDone=ALL_MONTHS.filter(monthDone).length;
+  document.getElementById("trackFill").style.width=(now?(now-1)/11*100:100)+"%";
+  document.getElementById("progressNote").innerHTML = now
+    ? `${doneCount} of ${ALL_TASKS.length} steps done. <span>You're on month ${now}: ${esc(ALL_MONTHS[now-1].title.toLowerCase())}.</span>`
+    : `All ${ALL_TASKS.length} steps done. <span>Time to plan year 2.</span>`;
+}
+
+function refreshBudget(){
+  BUDGET.forEach(b=>{const inp=document.getElementById("sp-"+b.id); if(document.activeElement!==inp) inp.value=state.spend[b.id]??"";});
+  const spent=Object.values(state.spend).reduce((a,b)=>a+Number(b||0),0);
+  const m=document.getElementById("meter"); m.firstElementChild.style.width=Math.min(100,spent/TOTAL*100)+"%"; m.classList.toggle("over",spent>TOTAL);
+  const left=TOTAL-spent;
+  const rd=document.getElementById("resetDate"), rn=document.getElementById("resetNote");
+  if(document.activeElement!==rd) rd.value=state.reset||"";
+  rn.classList.remove("soon");
+  if(!state.reset){ rn.textContent="Add your reset date to see how long you have left to spend this year's budget."; }
+  else{
+    const today=new Date(); today.setHours(0,0,0,0);
+    const days=Math.round((new Date(state.reset+"T00:00:00")-today)/86400000);
+    if(days<0) rn.textContent="Your budget has reset. Clear the spent amounts and start on your year 2 plan below.";
+    else if(left>0 && days<=60){ rn.classList.add("soon"); rn.textContent=`${days} day${days===1?"":"s"} until reset and £${left.toFixed(0)} still unspent. Book anything remaining now, even if you'll use it later.`; }
+    else rn.textContent=`${days} day${days===1?"":"s"} until your budget resets.`;
+  }
+  document.getElementById("totals").innerHTML=`<div>£${spent.toFixed(0)} <span>spent</span></div><div>£${Math.abs(left).toFixed(0)} <span>${left>=0?"left":"over budget"}</span></div>`;
+}
+
+function renderWins(){
+  const ul=document.getElementById("winList");
+  if(!state.wins.length){ul.innerHTML=`<li class="empty" style="border:0">No wins yet. Your first one is planned for month 2.</li>`;return;}
+  ul.innerHTML=state.wins.map((w,i)=>`<li><div><time>${esc(w.d)}</time>${esc(w.t)}</div><button class="del" type="button" data-i="${i}">Remove</button></li>`).join("");
+}
+
+function renderAll(){refresh();refreshBudget();renderWins();}
+
+loadLocal();
+renderPlan();
+renderAll();
+setSync("Progress is saved in this browser.");
+
+(async()=>{
+  try{
+    if(!window.claude || !window.claude.use) return;
+    const db=await window.claude.use("db");
+    if(!db) return;
+    const ref=db.doc("roadmap/progress");
+    let first=true;
+    ref.onSnapshot(snap=>{
+      if(snap.exists){
+        const d=snap.data()||{};
+        if(!snap.hasPendingWrites){
+          state={done:Object.assign({},d.done||{}),spend:Object.assign({},d.spend||{}),wins:Array.isArray(d.wins)?d.wins.map(w=>({t:String(w.t||""),d:String(w.d||"")})):[],reset:typeof d.reset==="string"?d.reset:""};
+          saveLocal(); renderAll();
+        }
+      } else if(first && (Object.keys(state.done).length||Object.keys(state.spend).length||state.wins.length)){
+        flush(); // carry over anything already ticked in this browser
+      }
+      first=false;
+    },()=>{store=null;setSync("Progress is saved in this browser.");});
+    store=ref;
+    setSync("Progress is saved to this page, so it follows you across devices.");
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
