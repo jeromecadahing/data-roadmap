@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>My route from operations to data</title>
+<meta name="theme-color" content="#14213D">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Data roadmap">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -233,21 +242,21 @@ const PLAN = [
     phases:[
     { title:"Data foundations", intro:"SQL and data basics, the core of every analyst job.",
       months:[
-      { m:1, title:"Get set up and learn the basics", goal:"Start the course and get to know your company's data.",
-        tasks:["Buy Coursera Plus (annual) and start the Google Data Analytics Certificate","Finish courses 1–3 of the certificate, skimming anything you already know","Ask the data team what you can access in Metabase and whether there's a sandbox","Open three existing ops dashboards and note what each one answers","Do the introductory Metabase Learn tutorials"],
+      { m:1, v:"b", title:"Get set up and learn the basics", goal:"Start the Google certificate and get to know your company's data.",
+        tasks:["Buy Coursera Plus (annual) and enrol in the Google Data Analytics Professional Certificate","Google course 1: Foundations: Data, Data, Everywhere (skim anything you already know)","Google course 2: Ask Questions to Make Data-Driven Decisions","Google course 3: Prepare Data for Exploration (your first SQL)","Ask the data team what you can access in Metabase and whether there's a sandbox","Open three existing ops dashboards and note what each one answers","Do the introductory Metabase Learn tutorials"],
         res:"Coursera, metabase.com/learn" },
-      { m:2, title:"SQL, then SQL at work", goal:"Write queries with confidence and answer a real ops question.",
-        tasks:["Work through all SQLBolt lessons","Build ten questions in Metabase's query builder, convert each to SQL and read the result","Solve 15 LeetCode easy database problems, focusing on joins and GROUP BY","Pick one ops question you get asked often and answer it in Metabase with SQL","Finish courses 4–6 of the certificate, which cover SQL and data cleaning","Add your first entry to the wins log"],
+      { m:2, v:"b", title:"SQL, then SQL at work", goal:"Write queries with confidence and answer a real ops question.",
+        tasks:["Google course 4: Process Data from Dirty to Clean","Google course 5: Analyze Data to Answer Questions","Work through all SQLBolt lessons","Build ten questions in Metabase's query builder, convert each to SQL and read the result","Solve 15 LeetCode easy database problems, focusing on joins and GROUP BY","Pick one ops question you get asked often and answer it in Metabase with SQL","Add your first entry to the wins log"],
         res:"SQLBolt, Mode SQL tutorial, LeetCode",
         milestone:"You can take a business question, query the data and explain the answer." }
       ]},
     { title:"Visualisation and statistics", intro:"Turn numbers into something people use, and learn to trust or question them.",
       months:[
-      { m:3, title:"Dashboards and statistics basics", goal:"Build your first team dashboard and learn how data varies.",
-        tasks:["Buy and read Storytelling with Data","Agree with your manager on one recurring report to replace","Build it as a Metabase dashboard and get feedback from two teammates","Complete Khan Academy's statistics units on distributions and variability","Watch StatQuest videos on the normal distribution, variance and correlation","Finish courses 7–9 of the Google certificate, skimming the R course since you'll learn Python instead"],
+      { m:3, v:"b", title:"Dashboards and statistics basics", goal:"Finish the Google certificate's core courses, build your first team dashboard and learn how data varies.",
+        tasks:["Google course 6: Share Data Through the Art of Visualization (it uses Tableau, so apply the ideas in Metabase)","Buy and read Storytelling with Data","Agree with your manager on one recurring report to replace, then build it as a Metabase dashboard and get feedback from two teammates","Google course 7: Data Analysis with R Programming (skim it, since you'll learn Python instead)","Google course 8: Google Data Analytics Capstone, completing a case study you can add to your portfolio","Complete Khan Academy's statistics units on distributions and variability","Watch StatQuest videos on the normal distribution, variance and correlation"],
         res:"Storytelling with Data (Knaflic), Khan Academy, StatQuest" },
       { m:4, title:"Testing and checking in", goal:"Learn hypothesis and A/B testing, then take stock.",
-        tasks:["Buy and complete a statistics or A/B testing course","Learn what a p-value and a confidence interval really mean","Find one misleading average in your ops data and explain why","Share your dashboard more widely and see who relies on it","Review progress with your manager and mention your interest in data work"],
+        tasks:["Buy and complete a statistics or A/B testing course","Learn what a p-value and a confidence interval really mean","Find one misleading average in your ops data and explain why","Share your dashboard more widely and see who relies on it","Review progress with your manager and mention your interest in data work","Google course 9: Accelerate Your Job Search with AI, then claim your certificate"],
         milestone:"Analyst-ready: SQL, dashboards, statistics basics and one tool people rely on." }
       ]}
   ]},
@@ -256,22 +265,22 @@ const PLAN = [
     { title:"Python for analysis", intro:"Python lets you do what dashboards can't.",
       months:[
       { m:5, title:"Python and pandas", goal:"Write Python comfortably and analyse data with pandas.",
-        tasks:["Complete Kaggle's free Python micro-course","Complete the Python modules of the IBM Data Science Certificate","Buy Python for Data Analysis and work through the pandas chapters","Complete Kaggle's pandas course","Write small scripts daily, using AI to explain anything you don't follow"],
-        res:"Kaggle Learn, IBM Data Science Certificate, Python for Data Analysis (McKinney)" },
+        tasks:["Complete Kaggle's free Python micro-course","IBM Data Science Certificate: Python for Data Science, AI & Development","Buy Python for Data Analysis and work through the pandas chapters","Complete Kaggle's pandas course","Write small scripts daily, using AI to explain anything you don't follow"],
+        res:"Kaggle Learn, IBM Data Science Professional Certificate, Python for Data Analysis (McKinney)" },
       { m:6, title:"Automate something real", goal:"Use Python on real work and save your team time.",
-        tasks:["Complete Kaggle's data cleaning and data visualisation courses","Recreate one of your Metabase analyses in pandas, using data you're allowed to export","Find a manual ops task that takes someone time every week","Automate it with Python, with approval, and log the time saved as a win","Start looking at internal analyst roles and ask the data team how people have moved across"],
+        tasks:["Complete Kaggle's data cleaning and data visualisation courses","Recreate one of your Metabase analyses in pandas, using data you're allowed to export","Find a manual ops task that takes someone time every week","Automate it with Python, with approval, and log the time saved as a win","Start looking at internal analyst roles and ask the data team how people have moved across","IBM Data Science Certificate: Data Analysis with Python"],
         milestone:"You can automate a manual report with Python." }
       ]},
     { title:"Machine learning and portfolio", intro:"Machine learning basics and proof you can do the work.",
       months:[
       { m:7, title:"Machine learning basics", goal:"Understand how models learn from data.",
-        tasks:["Complete course 1 of Andrew Ng's Machine Learning Specialization (regression)","Buy Practical Statistics for Data Scientists and read the first three chapters","Set up GitHub and push your Python work to it"],
+        tasks:["Machine Learning Specialization course 1: Supervised Machine Learning: Regression and Classification","Buy Practical Statistics for Data Scientists and read the first three chapters","Set up GitHub and push your Python work to it"],
         res:"Coursera, Practical Statistics for Data Scientists (Bruce & Bruce)" },
       { m:8, title:"First portfolio project", goal:"Show what you can do on a public dataset.",
-        tasks:["Complete course 2 of the ML Specialization (classification)","Complete Kaggle's Intro to Machine Learning course","Pick an ops-flavoured public dataset, like delivery delays or demand","Publish project 1 on GitHub with a clear write-up"],
+        tasks:["Machine Learning Specialization course 2: Advanced Learning Algorithms","Complete Kaggle's Intro to Machine Learning course","Pick an ops-flavoured public dataset, like delivery delays or demand","Publish project 1 on GitHub with a clear write-up"],
         res:"Kaggle datasets" },
       { m:9, title:"Second project", goal:"Finish the ML basics and build a second project.",
-        tasks:["Complete course 3 of the ML Specialization","Publish project 2 on GitHub, such as a simple demand forecast","Ask someone on the data team to review one of your projects"],
+        tasks:["Machine Learning Specialization course 3: Unsupervised Learning, Recommenders, Reinforcement Learning","Publish project 2 on GitHub, such as a simple demand forecast","Ask someone on the data team to review one of your projects"],
         milestone:"Two portfolio projects and a working grasp of machine learning basics." }
       ]}
   ]},
@@ -300,7 +309,7 @@ const BUDGET = [
 const TOTAL = 1000;
 
 // Assign stable ids
-PLAN.forEach(h=>h.phases.forEach(p=>p.months.forEach(mo=>{mo.ids=mo.tasks.map((_,i)=>`v2m${mo.m}t${i}`)})));
+PLAN.forEach(h=>h.phases.forEach(p=>p.months.forEach(mo=>{mo.ids=mo.tasks.map((_,i)=>`v2m${mo.m}${mo.v||""}t${i}`)})));
 const ALL_MONTHS = PLAN.flatMap(h=>h.phases.flatMap(p=>p.months));
 const ALL_TASKS = ALL_MONTHS.flatMap(m=>m.ids);
 
@@ -463,6 +472,9 @@ setSync("Progress is saved in this browser.");
     setSync("Progress is saved to this page, so it follows you across devices.");
   }catch(e){}
 })();
+</script>
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});}
 </script>
 </body>
 </html>
